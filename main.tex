@@ -55,8 +55,8 @@ The version of the finished product is important for everyone involved.
 The version of the individual components is more important for the developers, testers, and maintainers of the product.
 
 Component version resolution is addressed during the build process.
-The most common strategy is to have a component know the minimum (latest) version of the other components it needs. 
-It is also possible to have each component know the list of others that depend on it.  
+The most common strategy is to have a component know the minimum (latest) version of the other components it needs, see \ref{fig:dependency-to-build-self}. 
+It is also possible to have each component know the list of others that depend on it, see \ref{fig:dependency-to-build-others}.  
 
 \begin{figure}
     \centering
@@ -70,12 +70,41 @@ It is also possible to have each component know the list of others that depend o
         \node[rnode] (C) [above left of= A]{DbService};
         \node[rnode] (D) [above right of=A] {Notifications};
 
-        \path (A) edge node {1.2.234} (B)
-            (A) edge [bend left] node {3.1.16} (C)
-            (A) edge [bend right] node {1.1.34} (D);
+        \path (A) edge node {$>1.2.1$} (B)
+            (A) edge [bend left] node {$>3.1.1$} (C)
+            (A) edge [bend right] node {$>1.1.10$} (D)(D) edge [loop above] node {} (D)
+            (B) edge [loop above] node {1.2.65} (B)
+            (C) edge [loop above] node {3.1.250} (C)
+            (D) edge [loop above] node {1.1.19} (D);
     \end{tikzpicture}
-    \caption{Dependencies most common model}
-    \label{fig:my_label}
+  \caption{Fictional example of component dependency resolution where component \textit{SmrtHVRService} requires minimum versions of \textit{DBService} $>$ v3.1.1, \textit{HVRLib} $>$ v1.2.1, and \textit{Notifications} $>$ v1.1.10}
+    \label{fig:dependency-to-build-self}
+\end{figure}
+
+
+\begin{figure}
+    \centering
+    \begin{tikzpicture}[
+        rnode/.style={rectangle, draw=blue!60!white, fill=green!5, very thick, minimum size=7mm}, 
+        node distance=4.5cm,
+        ->,>=stealth',shorten >=1pt,auto
+    ]
+        \node[rnode] (A) {HVRLib};
+        \node[rnode] (B) [below of=A] {SmrtHVRService};
+        \node[rnode] (C) [below right of= A]{Notifications};
+        \node[rnode] (D) [below left of= A]{AutoDeleter};
+
+        \path (A) edge node {1.2.65} (B)
+            (A) edge [bend left] node {1.2.65} (C)
+            (A) edge [bend right] node {1.2.65} (D)
+            
+            (A) edge [loop above] node {1.2.65} (A)
+            (B) edge [loop below] node {6.3.110} (B)
+            (C) edge [loop below] node {3.1.250} (C)
+            (D) edge [loop below] node {1.3.72} (D);
+    \end{tikzpicture}
+  \caption{Fictional example of component dependency resolution where component \textit{HVRLib} is required to build \textit{Notifications}, \textit{SmrtHVRService}, and \textit{AutoDeleter}}
+    \label{fig:dependency-to-build-others}
 \end{figure}
 
 The most widely used system is semantic versioning \cite{Wikipedia_software_version}.
